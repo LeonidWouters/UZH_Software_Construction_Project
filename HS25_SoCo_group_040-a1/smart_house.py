@@ -1,3 +1,4 @@
+import pprint
 # Definition of Parent Classes
 
 # Parent Class <Devices>
@@ -51,7 +52,7 @@ def is_connected(connectable):
 
 # Definition of Subclasses
 
-# Subclass Light
+# Subclass <Light>
 
 def make_light(name: str, location: str, base_power: float, status, brightness):
     light = make_device(name, location, base_power, status)
@@ -72,12 +73,43 @@ def describe_device_light(light):
     return (f"The {light['name']} is located in the {light['location']}, "
             f"is currently {light['status']}, and is set to {light['brightness']}% brightness.")
 
-test_light = make_light("Test Light", "Living Room", 19.79, "off", 90)
+# test_light = make_light("Test Light", "Living Room", 19.79, "off", 90)
+#
+# toggle_status(test_light)
+# print(test_light)
+# print(get_power_consumption_light(test_light))
+# print(describe_device_light(test_light))
 
-toggle_status(test_light)
-print(test_light)
-print(get_power_consumption_light(test_light))
-print(describe_device_light(test_light))
+# Subclass <Thermostat>
+
+def make_thermostat(name: str, location: str, base_power: float, status, room_temperature: int, target_temperature: int):
+    thermostat = make_device(name, location, base_power, status)
+    thermostat.update(make_connectable())
+    thermostat["_classname"] = "Thermostat"
+    thermostat["_parent"] = ["Device", "Connectable"]
+    thermostat["room_temperature"] = room_temperature
+    thermostat["target_temperature"] = target_temperature
+    return thermostat
+
+
+def get_power_consumption_thermostat(thermostat):
+    if thermostat["status"] == "on":
+        return thermostat["base_power"]*abs(thermostat["target_temperature"] - thermostat["room_temperature"])
+    else:
+        return 0
+
+
+def describe_device_thermostat(thermostat):
+    pass
+
+
+# test_thermo = make_thermostat("test_thermo", "bathroom", 4.9, "off", 18, 23)
+# pprint.pprint(test_thermo)
+# toggle_status(test_thermo)
+# connect(test_thermo, "19.09.22.11.001")
+# pprint.pprint(test_thermo)
+# print(get_power_consumption_thermostat(test_thermo))
+
 
 
 
