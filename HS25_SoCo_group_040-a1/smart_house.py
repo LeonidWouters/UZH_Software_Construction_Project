@@ -14,8 +14,8 @@ def make(cls, *args):
     return cls["_new"](*args)
 #### end - from class notes and book ####
 
+##########################################--STEP1--##########################################
 ############## Parent Classes ##############
-
 ###################
 ### Device ###
 def device_toggle_status(obj):
@@ -201,3 +201,41 @@ for d in devices:
 ### TODO: Implement more here!!! 
 ## task: Use the method describe device() to verify that all of the functionality is correct.
 ## not all functionality is listed atm...   
+
+
+##########################################--STEP2--##########################################
+###################
+### SmartHouseManagement ###
+
+def calculate_total_power_consumption(search_type = None, search_room = None):
+    ## TODO
+    pass
+
+def get_all_device_description():
+    ## TODO
+    pass
+
+def get_all_connected_devices(ip = None):
+    ## TODO
+    pass
+
+def smart_house_manager_new(name: str, search_type=None, search_room=None):
+    return {
+        "name": name, 
+        "search_type": search_type,
+        "search_room": search_room,
+        "_class": SmartHouseManagement
+    }
+
+SmartHouseManagement = {
+    "calculate_total_power_consumption": calculate_total_power_consumption,
+    "get_all_device_description": get_all_device_description,
+    "get_all_connected_devices": get_all_connected_devices,
+    "_classname": "SmartHouseManagement",
+    "_parent": None,
+    "_new": smart_house_manager_new,
+}
+
+print("manager instance dummy..")
+manager_test = make(SmartHouseManagement, "Manager", "Light", "Bedroom")
+print(manager_test)
