@@ -3,11 +3,24 @@ def call(obj, method_name, *args):
     method = find(obj["_class"], method_name)
     return method(obj, *args)
 
-def find(cls, method_name): ## TODO: update to find both parents... atm, checks only one!
-    while cls is not None:
-        if method_name in cls:
-            return cls[method_name]
-        cls = cls["_parent"]
+def find(cls, method_name):
+    # 1. Search in the class itself
+    if method_name in cls:
+        return cls[method_name]
+    # 2. If nothing is found in class, search in parents
+    parents = cls.get("_parent")
+    # If there is no parent defined, raise an Error
+    if not parents:
+        raise NotImplementedError(f"Method {method_name} is not implemented")
+    # If there is only one parent, create a list of the single parent
+    if not isinstance(parents, list):
+        parents = [parents]
+    # Iterate over the list of parents, even if there is only one parent (then only one iteration)
+    for p in parents:
+        try:
+            return find(p, method_name)
+        except NotImplementedError:
+            pass
     raise NotImplementedError(f"Method {method_name} is not implemented")
 
 def make(cls, *args):
@@ -104,12 +117,6 @@ Light = {
     "_new": light_new,
 }
 
-# test_light = make_light("Test Light", "Living Room", 19.79, "off", 90)
-#
-# toggle_status(test_light)
-# print(test_light)
-# print(get_power_consumption_light(test_light))
-# print(describe_device_light(test_light))
 
 ###################
 ### Thermostat ###
@@ -120,9 +127,14 @@ def thermostat_get_power_consumption(thermostat):
         return 0
 
 def thermostat_describe(obj):
-    print("todo ... thermostat")
-    ## TODO
-    pass
+    if obj['connected']:
+        return (f"The {obj['name']} is located in the {obj['location']}, "
+                f"is currently {obj['status']}, and is currently set to {obj['target_temperature']} degree in a {obj['room_temperature']}"
+                f" degree room. It is currently connected to {obj['ip']}.")
+    else:
+        return (f"The {obj['name']} is located in the {obj['location']}, "
+                f"is currently {obj['status']}, is set to {obj['target_temperature']} degree in a {obj['room_temperature']}"
+                f" degree room. It is currently disconnected.")
 
 def set_target(obj, temperature: int):
     obj["target_temperature"] = temperature
@@ -149,13 +161,6 @@ Thermostat = {
     "_new": thermostat_new
 }
 
-# test_thermo = make_thermostat("test_thermo", "bathroom", 4.9, "off", 18, 23)
-# pprint.pprint(test_thermo)
-# toggle_status(test_thermo)
-# connect(test_thermo, "19.09.22.11.001")
-# pprint.pprint(test_thermo)
-# print(get_power_consumption_thermostat(test_thermo))
-
 
 ###################
 ### Camera ###
@@ -165,8 +170,22 @@ def camera_get_power_consumption(obj):
     return obj["base_power"] * obj["resolution_factor"]
 
 def camera_describe(obj):
-    ##TODO
-    pass
+    resolution_factor = ""
+    if obj["resolution_factor"] < 5:
+        resolution_factor = "low"
+    if 5 <= obj["resolution_factor"] <10:
+        resolution_factor = "medium"
+    if obj["resolution_factor"] >= 10:
+        resolution_factor = "high"
+
+    if obj["connected"]:
+        return (f"The {obj['name']} is located in the {obj['location']}, "
+                f"is currently {obj['status']}, and is a {resolution_factor} resolution sensor."
+                f" It is currently connected to {obj['ip']}.")
+    else:
+        return (f"The {obj['name']} is located in the {obj['location']}, "
+                f"is currently {obj['status']}, and is a {resolution_factor} resolution sensor"
+                f" It is currently disconnected.")
 
 def camera_new(name: str, location: str, base_power: float, status: str, resolution_factor: int):
     device = make(Device, name, location, base_power, status)
@@ -197,10 +216,33 @@ for d in devices:
     print(call(d, "describe_device"))
     print("power:", call(d, "get_power_consumption"))
     print("---")
-    
-### TODO: Implement more here!!! 
+
+
 ## task: Use the method describe device() to verify that all of the functionality is correct.
-## not all functionality is listed atm...   
+## not all functionality is listed atm...
+print("=== Testing Thermostat ===")
+call(bathroom_thermostat, "connect", "192.168.1.5")
+print("Connected?", call(bathroom_thermostat, "is_connected"))
+print(call(bathroom_thermostat, "describe_device"))
+print("Power:", call(bathroom_thermostat, "get_power_consumption"))
+call(bathroom_thermostat, "toggle_status")
+call(bathroom_thermostat, "disconnect")
+print("Connected?", call(bathroom_thermostat, "is_connected"))
+print(call(bathroom_thermostat, "describe_device"))
+print("Power:", call(bathroom_thermostat, "get_power_consumption"))
+print("---")
+
+print("=== Testing Camera ===")
+call(living_room_camera, "connect", "192.168.1.5")
+print("Connected?", call(living_room_camera, "is_connected"))
+print(call(living_room_camera, "describe_device"))
+print("Power:", call(living_room_camera, "get_power_consumption"))
+call(living_room_camera, "toggle_status")
+call(living_room_camera, "disconnect")
+print("Connected?", call(living_room_camera, "is_connected"))
+print(call(living_room_camera, "describe_device"))
+print("Power:", call(living_room_camera, "get_power_consumption"))
+print("---")
 
 
 ##########################################--STEP2--##########################################
