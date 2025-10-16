@@ -261,30 +261,48 @@ print("---")
 
 def calculate_total_power_consumption(search_type = None, search_room = None):
     total_power_consumption = 0
-    if search_type and search_room:
-        for device in global_devices:
-            if device["_classname"] == search_type and device["location"] == search_room:
-                total_power_consumption += call(device, "get_power_consumption")
-    if search_type:
-        for device in global_devices:
-            if device["_classname"] == search_type:
-                total_power_consumption += call(device, "get_power_consumption")
-    if search_room:
-        for device in global_devices:
-            if device["location"] == search_room:
-                total_power_consumption += call(device, "get_power_consumption")
-    else:
-        for device in global_devices:
+    for device in global_devices:
+        if search_type and search_room:
+                if device["_class"]["_classname"] == search_type and device["location"] == search_room:
+                    total_power_consumption += call(device, "get_power_consumption")
+        elif search_type:
+                if device["_class"]["_classname"]  == search_type:
+                    total_power_consumption += call(device, "get_power_consumption")
+        elif search_room:
+                if device["location"] == search_room:
+                    total_power_consumption += call(device, "get_power_consumption")
+        else:
             total_power_consumption += call(device, "get_power_consumption")
     return total_power_consumption
 
 def get_all_device_description(search_type= None, search_room = None):
-    ## TODO
-    pass
+    list_of_descriptions = []
+    for device in global_devices:
+        if search_type and search_room:
+                if device["_class"]["_classname"] == search_type and device["location"] == search_room:
+                    list_of_descriptions.append((call(device, "describe_device")))
+        elif search_type:
+                if device["_class"]["_classname"]  == search_type:
+                    list_of_descriptions.append((call(device, "describe_device")))
+        elif search_room:
+                if device["location"] == search_room:
+                    list_of_descriptions.append((call(device, "describe_device")))
+        else:
+            list_of_descriptions.append((call(device, "describe_device")))
+    return list_of_descriptions #TODO Output looks pretty ugly atm...
 
 def get_all_connected_devices(ip = None):
-
-    pass
+    list_of_descriptions = []
+    for device in global_devices:
+        if device["_class"]["_classname"] in ["Thermostat", "Camera"]:
+            if call(device, "is_connected") and device["status"] == "on":
+                if device["ip"] == ip:
+                    list_of_descriptions.append((call(device, "get_power_consumption")))
+                    list_of_descriptions.append((call(device, "describe_device")))
+        else:
+            list_of_descriptions.append((call(device, "get_power_consumption")))
+            list_of_descriptions.append((call(device, "describe_device")))
+    return list_of_descriptions #TODO Test if the method is working appropriately... and the output looks ugly as well
 
 def smart_house_manager_new(name: str, search_type=None, search_room=None):
     return {
@@ -306,5 +324,11 @@ SmartHouseManagement = {
 print("manager instance dummy..")
 manager_test = make(SmartHouseManagement, "Manager", "Light", "Bedroom")
 print(manager_test)
+print(calculate_total_power_consumption())
+print(calculate_total_power_consumption(search_type="Camera"))
+print(get_all_device_description())
+print(get_all_connected_devices())
 
-print(calculate_total_power_consumption(search_room="Bathroom"))
+
+##### Instances of Smart House Management
+#TODO Create instances of Smart House Management and test if everything works fine when changing stuff
