@@ -1,13 +1,30 @@
 #### from class notes and book ####
+
+# Global Dictionary of created Devices
+global_devices = []
+
 def call(obj, method_name, *args):
     method = find(obj["_class"], method_name)
     return method(obj, *args)
 
-def find(cls, method_name): ## TODO: update to find both parents... atm, checks only one!
-    while cls is not None:
-        if method_name in cls:
-            return cls[method_name]
-        cls = cls["_parent"]
+def find(cls, method_name):
+    # 1. Search in the class itself
+    if method_name in cls:
+        return cls[method_name]
+    # 2. If nothing is found in class, search in parents
+    parents = cls.get("_parent")
+    # If there is no parent defined, raise an Error
+    if not parents:
+        raise NotImplementedError(f"Method {method_name} is not implemented")
+    # If there is only one parent, create a list of the single parent
+    if not isinstance(parents, list):
+        parents = [parents]
+    # Iterate over the list of parents, even if there is only one parent (then only one iteration)
+    for p in parents:
+        try:
+            return find(p, method_name)
+        except NotImplementedError:
+            pass
     raise NotImplementedError(f"Method {method_name} is not implemented")
 
 def make(cls, *args):
@@ -56,7 +73,7 @@ def connectable_connect(obj, ip):
 
 def connectable_disconnect(obj):
     obj["connected"] = False
-    # obj["ip"] = None
+    obj["ip"] = None            #This way, the key 'ip' stays in the dictionary!
 
 def connectable_is_connected(obj):
     return obj["connected"]
@@ -91,10 +108,12 @@ def light_describe(obj):
             f"is currently {obj['status']}, and is set to {obj['brightness']}% brightness.")
     
 def light_new(name: str, location: str, base_power: float, status: str, brightness: int):
-    return make(Device, name, location, base_power, status) | {
+    obj = make(Device, name, location, base_power, status) | {
         "brightness": int(brightness),
         "_class": Light,
     }
+    global_devices.append(obj)
+    return obj
     
 Light = {
     "get_power_consumption": light_get_power_consumption,
@@ -104,12 +123,6 @@ Light = {
     "_new": light_new,
 }
 
-# test_light = make_light("Test Light", "Living Room", 19.79, "off", 90)
-#
-# toggle_status(test_light)
-# print(test_light)
-# print(get_power_consumption_light(test_light))
-# print(describe_device_light(test_light))
 
 ###################
 ### Thermostat ###
@@ -120,9 +133,14 @@ def thermostat_get_power_consumption(thermostat):
         return 0
 
 def thermostat_describe(obj):
-    print("todo ... thermostat")
-    ## TODO
-    pass
+    if obj['connected']:
+        return (f"The {obj['name']} is located in the {obj['location']}, "
+                f"is currently {obj['status']}, and is currently set to {obj['target_temperature']} degree in a {obj['room_temperature']}"
+                f" degree room. It is currently connected to {obj['ip']}.")
+    else:
+        return (f"The {obj['name']} is located in the {obj['location']}, "
+                f"is currently {obj['status']}, is set to {obj['target_temperature']} degree in a {obj['room_temperature']}"
+                f" degree room. It is currently disconnected.")
 
 def set_target(obj, temperature: int):
     obj["target_temperature"] = temperature
@@ -133,11 +151,13 @@ def get_target(obj):
 def thermostat_new(name: str, location: str, base_power: float, status: str, room_temperature: int, target_temperature: int):
     device = make(Device, name, location, base_power, status)
     connectable  = make(Connectable)
-    return device | connectable | {
+    obj = device | connectable | {
         "room_temperature": int(room_temperature),
         "target_temperature": int(target_temperature),
         "_class": Thermostat,
     }
+    global_devices.append(obj)
+    return obj
 
 Thermostat = {
     "get_power_consumption": thermostat_get_power_consumption,
@@ -149,13 +169,6 @@ Thermostat = {
     "_new": thermostat_new
 }
 
-# test_thermo = make_thermostat("test_thermo", "bathroom", 4.9, "off", 18, 23)
-# pprint.pprint(test_thermo)
-# toggle_status(test_thermo)
-# connect(test_thermo, "19.09.22.11.001")
-# pprint.pprint(test_thermo)
-# print(get_power_consumption_thermostat(test_thermo))
-
 
 ###################
 ### Camera ###
@@ -165,16 +178,32 @@ def camera_get_power_consumption(obj):
     return obj["base_power"] * obj["resolution_factor"]
 
 def camera_describe(obj):
-    ##TODO
-    pass
+    resolution_factor = ""
+    if obj["resolution_factor"] < 5:
+        resolution_factor = "low"
+    if 5 <= obj["resolution_factor"] <10:
+        resolution_factor = "medium"
+    if obj["resolution_factor"] >= 10:
+        resolution_factor = "high"
+
+    if obj["connected"]:
+        return (f"The {obj['name']} is located in the {obj['location']}, "
+                f"is currently {obj['status']}, and is a {resolution_factor} resolution sensor."
+                f" It is currently connected to {obj['ip']}.")
+    else:
+        return (f"The {obj['name']} is located in the {obj['location']}, "
+                f"is currently {obj['status']}, and is a {resolution_factor} resolution sensor"
+                f" It is currently disconnected.")
 
 def camera_new(name: str, location: str, base_power: float, status: str, resolution_factor: int):
     device = make(Device, name, location, base_power, status)
     connectable  = make(Connectable)
-    return device | connectable | {
+    obj = device | connectable | {
         "resolution_factor": int(resolution_factor),
         "_class": Camera,
     }
+    global_devices.append(obj)
+    return obj
 
 Camera = {
     "get_power_consumption": camera_get_power_consumption,
@@ -197,10 +226,33 @@ for d in devices:
     print(call(d, "describe_device"))
     print("power:", call(d, "get_power_consumption"))
     print("---")
-    
-### TODO: Implement more here!!! 
+
+
 ## task: Use the method describe device() to verify that all of the functionality is correct.
-## not all functionality is listed atm...   
+## not all functionality is listed atm...
+print("=== Testing Thermostat ===")
+call(bathroom_thermostat, "connect", "192.168.1.5")
+print("Connected?", call(bathroom_thermostat, "is_connected"))
+print(call(bathroom_thermostat, "describe_device"))
+print("Power:", call(bathroom_thermostat, "get_power_consumption"))
+#call(bathroom_thermostat, "toggle_status")
+call(bathroom_thermostat, "disconnect")
+print("Connected?", call(bathroom_thermostat, "is_connected"))
+print(call(bathroom_thermostat, "describe_device"))
+print("Power:", call(bathroom_thermostat, "get_power_consumption"))
+print("---")
+
+print("=== Testing Camera ===")
+call(living_room_camera, "connect", "192.168.1.5")
+print("Connected?", call(living_room_camera, "is_connected"))
+print(call(living_room_camera, "describe_device"))
+print("Power:", call(living_room_camera, "get_power_consumption"))
+#call(living_room_camera, "toggle_status")
+#call(living_room_camera, "disconnect")
+print("Connected?", call(living_room_camera, "is_connected"))
+print(call(living_room_camera, "describe_device"))
+print("Power:", call(living_room_camera, "get_power_consumption"))
+print("---")
 
 
 ##########################################--STEP2--##########################################
@@ -208,16 +260,49 @@ for d in devices:
 ### SmartHouseManagement ###
 
 def calculate_total_power_consumption(search_type = None, search_room = None):
-    ## TODO
-    pass
+    total_power_consumption = 0
+    for device in global_devices:
+        if search_type and search_room:
+                if device["_class"]["_classname"] == search_type and device["location"] == search_room:
+                    total_power_consumption += call(device, "get_power_consumption")
+        elif search_type:
+                if device["_class"]["_classname"]  == search_type:
+                    total_power_consumption += call(device, "get_power_consumption")
+        elif search_room:
+                if device["location"] == search_room:
+                    total_power_consumption += call(device, "get_power_consumption")
+        else:
+            total_power_consumption += call(device, "get_power_consumption")
+    return total_power_consumption
 
-def get_all_device_description():
-    ## TODO
-    pass
+def get_all_device_description(search_type= None, search_room = None):
+    list_of_descriptions = []
+    for device in global_devices:
+        if search_type and search_room:
+                if device["_class"]["_classname"] == search_type and device["location"] == search_room:
+                    list_of_descriptions.append((call(device, "describe_device")))
+        elif search_type:
+                if device["_class"]["_classname"]  == search_type:
+                    list_of_descriptions.append((call(device, "describe_device")))
+        elif search_room:
+                if device["location"] == search_room:
+                    list_of_descriptions.append((call(device, "describe_device")))
+        else:
+            list_of_descriptions.append((call(device, "describe_device")))
+    return list_of_descriptions #TODO Output looks pretty ugly atm...
 
 def get_all_connected_devices(ip = None):
-    ## TODO
-    pass
+    list_of_descriptions = []
+    for device in global_devices:
+        if device["_class"]["_classname"] in ["Thermostat", "Camera"]:
+            if call(device, "is_connected") and device["status"] == "on":
+                if device["ip"] == ip:
+                    list_of_descriptions.append((call(device, "get_power_consumption")))
+                    list_of_descriptions.append((call(device, "describe_device")))
+        else:
+            list_of_descriptions.append((call(device, "get_power_consumption")))
+            list_of_descriptions.append((call(device, "describe_device")))
+    return list_of_descriptions #TODO Test if the method is working appropriately... and the output looks ugly as well
 
 def smart_house_manager_new(name: str, search_type=None, search_room=None):
     return {
@@ -239,3 +324,11 @@ SmartHouseManagement = {
 print("manager instance dummy..")
 manager_test = make(SmartHouseManagement, "Manager", "Light", "Bedroom")
 print(manager_test)
+print(calculate_total_power_consumption())
+print(calculate_total_power_consumption(search_type="Camera"))
+print(get_all_device_description())
+print(get_all_connected_devices())
+
+
+##### Instances of Smart House Management
+#TODO Create instances of Smart House Management and test if everything works fine when changing stuff
