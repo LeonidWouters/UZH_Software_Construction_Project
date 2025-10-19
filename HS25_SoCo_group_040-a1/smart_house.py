@@ -192,7 +192,7 @@ def camera_describe(obj):
                 f" It is currently connected to {obj['ip']}.")
     else:
         return (f"The {obj['name']} is located in the {obj['location']}, "
-                f"is currently {obj['status']}, and is a {resolution_factor} resolution sensor"
+                f"is currently {obj['status']}, and is a {resolution_factor} resolution sensor."
                 f" It is currently disconnected.")
 
 def camera_new(name: str, location: str, base_power: float, status: str, resolution_factor: int):
@@ -213,46 +213,46 @@ Camera = {
     "_new": camera_new,
 }
 
+if __name__ == "__main__":
+    ###################
+    ### Task 4 - Instances ###
+    living_room_camera   = make(Camera,     "Camera_Test",   "Living Room", 500, "on",  8)
+    bathroom_thermostat  = make(Thermostat, "Thermostat_Test", "Bathroom",    1200, "on", 18, 24)
+    bedroom_light        = make(Light,      "Light_Test",   "Bedroom",     300, "off", 70)
 
-###################
-### Task 4 - Instances ###
-living_room_camera   = make(Camera,     "Camera_Test",   "Living Room", 500, "on",  8)
-bathroom_thermostat  = make(Thermostat, "Thermostat_Test", "Bathroom",    1200, "on", 18, 24)
-bedroom_light        = make(Light,      "Light_Test",   "Bedroom",     300, "off", 70)
+    devices = [living_room_camera, bathroom_thermostat, bedroom_light]
 
-devices = [living_room_camera, bathroom_thermostat, bedroom_light]
+    for d in devices:
+        print(call(d, "describe_device"))
+        print("power:", call(d, "get_power_consumption"))
+        print("---")
 
-for d in devices:
-    print(call(d, "describe_device"))
-    print("power:", call(d, "get_power_consumption"))
+
+    ## task: Use the method describe device() to verify that all of the functionality is correct.
+    ## not all functionality is listed atm...
+    print("=== Testing Thermostat ===")
+    call(bathroom_thermostat, "connect", "192.168.1.5")
+    print("Connected?", call(bathroom_thermostat, "is_connected"))
+    print(call(bathroom_thermostat, "describe_device"))
+    print("Power:", call(bathroom_thermostat, "get_power_consumption"))
+    #call(bathroom_thermostat, "toggle_status")
+    call(bathroom_thermostat, "disconnect")
+    print("Connected?", call(bathroom_thermostat, "is_connected"))
+    print(call(bathroom_thermostat, "describe_device"))
+    print("Power:", call(bathroom_thermostat, "get_power_consumption"))
     print("---")
 
-
-## task: Use the method describe device() to verify that all of the functionality is correct.
-## not all functionality is listed atm...
-print("=== Testing Thermostat ===")
-call(bathroom_thermostat, "connect", "192.168.1.5")
-print("Connected?", call(bathroom_thermostat, "is_connected"))
-print(call(bathroom_thermostat, "describe_device"))
-print("Power:", call(bathroom_thermostat, "get_power_consumption"))
-#call(bathroom_thermostat, "toggle_status")
-call(bathroom_thermostat, "disconnect")
-print("Connected?", call(bathroom_thermostat, "is_connected"))
-print(call(bathroom_thermostat, "describe_device"))
-print("Power:", call(bathroom_thermostat, "get_power_consumption"))
-print("---")
-
-print("=== Testing Camera ===")
-call(living_room_camera, "connect", "192.168.1.5")
-print("Connected?", call(living_room_camera, "is_connected"))
-print(call(living_room_camera, "describe_device"))
-print("Power:", call(living_room_camera, "get_power_consumption"))
-#call(living_room_camera, "toggle_status")
-#call(living_room_camera, "disconnect")
-print("Connected?", call(living_room_camera, "is_connected"))
-print(call(living_room_camera, "describe_device"))
-print("Power:", call(living_room_camera, "get_power_consumption"))
-print("---")
+    print("=== Testing Camera ===")
+    call(living_room_camera, "connect", "192.168.1.5")
+    print("Connected?", call(living_room_camera, "is_connected"))
+    print(call(living_room_camera, "describe_device"))
+    print("Power:", call(living_room_camera, "get_power_consumption"))
+    #call(living_room_camera, "toggle_status")
+    #call(living_room_camera, "disconnect")
+    print("Connected?", call(living_room_camera, "is_connected"))
+    print(call(living_room_camera, "describe_device"))
+    print("Power:", call(living_room_camera, "get_power_consumption"))
+    print("---")
 
 
 ##########################################--STEP2--##########################################
@@ -320,14 +320,14 @@ SmartHouseManagement = {
     "_parent": None,
     "_new": smart_house_manager_new,
 }
-
-print("manager instance dummy..")
-manager_test = make(SmartHouseManagement, "Manager", "Light", "Bedroom")
-print(manager_test)
-print(calculate_total_power_consumption())
-print(calculate_total_power_consumption(search_type="Camera"))
-print(get_all_device_description())
-print(get_all_connected_devices())
+if __name__ == "__main__":
+    print("manager instance dummy..")
+    manager_test = make(SmartHouseManagement, "Manager", "Light", "Bedroom")
+    print(manager_test)
+    print(calculate_total_power_consumption())
+    print(calculate_total_power_consumption(search_type="Camera"))
+    print(get_all_device_description())
+    print(get_all_connected_devices())
 
 
 ##### Instances of Smart House Management
