@@ -9,7 +9,7 @@ def parse_args(): ##### DISCLAIMER - parse_args function is generated with help 
     i = 1
     while i < len(sys.argv):
         a = sys.argv[i]
-        if a in ("--select") and i + 1 < len(sys.argv):
+        if a == "--select" and i + 1 < len(sys.argv):
             select = sys.argv[i + 1]
             i += 2
             continue

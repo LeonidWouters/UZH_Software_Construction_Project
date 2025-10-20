@@ -212,9 +212,9 @@ Camera = {
     "_new": camera_new,
 }
 
+###################
+### Task 4 - Instances ###
 if __name__ == "__main__":
-    ###################
-    ### Task 4 - Instances ###
     living_room_camera   = make(Camera,     "Camera_Test",   "Living Room", 500, "on",  8)
     bathroom_thermostat  = make(Thermostat, "Thermostat_Test", "Bathroom",    1200, "on", 18, 24)
     bedroom_light        = make(Light,      "Light_Test",   "Bedroom",     300, "off", 70)
