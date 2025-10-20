@@ -81,4 +81,6 @@ call(living_room_light, "get_power_consumption")
 1. def find(cls, method_name): ## TODO: update to find both parents... atm, checks only one! while cls is not None: if method_name in cls: return cls[method_name] cls = cls["_parent"] raise NotImplementedError(f"Method {method_name} is not implemented")
 Only one parent is found here. But what if there is a list of parents?
 2. How does the time.perf_counter() in python works?
-3. *Add the prompts made for the parse_args and clarification of callable...
+3. How to read the command line arguments in python, I need two arguments --select and --verbose
+4. Python, are variables callable, can it be used to see the difference between what is a function and what is a variable
+5. Title and bold text styling for readme, give me a working example 
