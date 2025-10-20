@@ -1,3 +1,36 @@
+# Classes and Objects
+### Creation of a new instance 
+#### `make(cls, *args)`
+Creates a new instance of a specified class.
+- Internally calls the `_new` method of the respective class structure (e.g., `Light`, `Camera`, `Thermostat`).
+- Adds the `_class` attribute so that the object knows which class it belongs to.
+- Is automatically used in subclasses to create and register devices.
+
+**Example:**
+```python
+living_room_light = make(Light, "Living Room Light", "Living Room", 300, "on", 80)
+```
+---
+### Call of methods on instances 
+#### `call(obj, method_name, *args, **kwargs)`
+Calls a method on an object by its method name.
+
+- Uses the find() function for method resolution along the class hierarchy
+(including multiple inheritance, e.g., with Thermostat or Camera).
+- Searches for the method first in the class itself, then in the parent classes.
+
+**Example:**
+```python
+call(living_room_light, "get_power_consumption")
+```
+---
+### Keeping track of created instances
+#### `global_devices = []`
+- Global list that stores all created device instances.
+- Automatically expands in the _new functions of Light, Camera, and Thermostat.
+- Enables centralized management by the SmartHouseManagement Manager
+(e.g., calculating total consumption, retrieving filtered device descriptions, ...).
+---
 # Tests
 ### Task 1 — Device Tests  
 - **test_light_turn_on:** light turns on when toggled 
@@ -36,8 +69,16 @@
 
 # Disclaimer
 - For the functions directly adapted from the lecture notes and/or book, related notes are added as comments to the functions themselves
+
 **AI use:** 
 - Create the check list of all the steps as to do items from the assignment description (to share tasks easier within the team)
 - Writing of "parse_args" function for test runner
 - Readme file styling
 - Clarification of the callable, for implementing verbose command option
+
+**Prompts made in ChatGPT**
+
+1. def find(cls, method_name): ## TODO: update to find both parents... atm, checks only one! while cls is not None: if method_name in cls: return cls[method_name] cls = cls["_parent"] raise NotImplementedError(f"Method {method_name} is not implemented")
+Only one parent is found here. But what if there is a list of parents?
+2. How does the time.perf_counter() in python works?
+3. *Add the prompts made for the parse_args and clarification of callable...
