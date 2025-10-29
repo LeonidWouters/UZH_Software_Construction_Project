@@ -1,0 +1,33 @@
+[
+  "seq",
+
+  ["set", "a_value", 6],
+  ["set", "b_value", 4],
+
+  ["set", "product_ab", ["*", ["get", "a_value"], ["get", "b_value"]]],
+  ["set", "quotient_a_div_b", ["/", ["get", "a_value"], ["get", "b_value"]]],
+  ["set", "two_to_power_five", ["^", 2, 5]],
+  ["set", "remainder_17_mod_5", ["%", 17, 5]],
+
+  ["set", "is_three_less_than_five", ["<", 3, 5]],
+  ["set", "is_ten_greater_equal_ten", [">=", 10, 10]],
+  ["set", "are_a_and_b_different", ["!=", ["get", "a_value"], ["get", "b_value"]]],
+
+  ["set", "both_comparisons_true",
+    ["AND", ["get", "is_three_less_than_five"], ["get", "is_ten_greater_equal_ten"]]
+  ],
+  ["set", "either_zero_or_difference_true",
+    ["OR", 0, ["get", "are_a_and_b_different"]]
+  ],
+  ["set", "negated_either",
+    ["NOT", ["get", "either_zero_or_difference_true"]]
+  ],
+
+  ["set", "current_x", 3],
+  ["do_until",
+    ["seq",
+      ["set", "current_x", ["*", ["get", "current_x"], 2]]
+    ],
+    [">=", ["get", "current_x"], 100]
+  ]]
+
