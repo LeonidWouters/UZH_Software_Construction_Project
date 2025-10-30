@@ -219,6 +219,62 @@ def do_concatenate_arrays(args, env):
     assert isinstance(array2, list), "Second argument must be an array"
     return array1 + array2
 
+
+# Info regarding sets: Sets are an unordered collection of unique elements
+# Create a set
+def do_create_set(args, env):
+    assert len(args) == 0
+    return set()
+
+# Add set element
+def do_add_set(args, env):
+    assert len(args) == 2
+    arg_set = do(args[0], env)
+    value = do(args[1], env)
+    assert isinstance(arg_set, set), "First argument must be an set"
+    if value not in arg_set:
+        arg_set.add(value)
+    else:
+        pass
+    return value
+
+# Remove set element
+def do_remove_set(args, env):
+    assert len(args) == 2
+    arg_set = do(args[0], env)
+    value = do(args[1], env)
+    assert isinstance(arg_set, set), "First argument must be an set"
+    if value in arg_set:
+        arg_set.remove(value)
+    else:
+        pass
+    return value
+
+def do_element_in_set(args, env):
+    assert len(args) == 2
+    arg_set = do(args[0], env)
+    value = do(args[1], env)
+    assert isinstance(arg_set, set), "First argument must be an set"
+    for element in arg_set:
+        if element in arg_set:
+            return True
+        else:
+            return False
+
+def do_get_size_set(args, env):
+    assert len(args) == 1
+    arg_set = do(args[0], env)
+    assert isinstance(arg_set, set), "Argument must be an set"
+    return len(arg_set)
+
+def do_merge_sets(args, env):
+    assert len(args) == 2
+    set_a = do(args[0], env)
+    set_b = do(args[1], env)
+    return set_a.union(set_b)    #TODO The result is correct, nevertheless,
+                                 # I don't get it how .union() gets to that specific order...
+
+
 #### OPERATIONS START ####
 OPS = {
     name.replace("do_","", 1): func

@@ -16,8 +16,21 @@
   ["set", "array_2_index_1", ["get_array", ["get", "array_2"], 1]],
   ["set", "array_2_size", ["get_size_array", ["get", "array_2"]]],
 
-  ["set", "concat_array_1_2", ["concatenate_arrays", ["get", "array_1"], ["get", "array_2"]]]
+  ["set", "concat_array_1_2", ["concatenate_arrays", ["get", "array_1"], ["get", "array_2"]]],
 
 
+  ["set", "set_1", ["create_set"]],
+  ["add_set", ["get", "set_1"], 3],
+  ["add_set", ["get", "set_1"], 5],
+  ["add_set", ["get", "set_1"], 199],
+  ["remove_set", ["get", "set_1"], 5],
+  ["set", "set_1_size", ["get_size_set", ["get", "set_1"]]],
 
+  ["set", "set_2", ["create_set"]],
+  ["add_set", ["get", "set_2"], 3],
+  ["add_set", ["get", "set_2"], 20],
+  ["add_set", ["get", "set_2"], 5],
+  ["set", "set_2_size", ["get_size_set", ["get", "set_2"]]],
+
+  ["set", "merged_set1_set2", ["merge_sets", ["get", "set_1"], ["get", "set_2"]]]
 ]
