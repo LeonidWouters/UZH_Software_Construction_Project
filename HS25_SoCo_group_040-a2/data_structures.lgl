@@ -1,0 +1,7 @@
+[
+  "seq",
+  ["set", "array_1", ["create_array", 5]],
+  ["set_array", ["get", "array_1"], 4, 10],
+  ["set", "array_1_pos_4", ["get_array", ["get", "array_1"], 4]],
+  ["set", "array_1_size", ["get_size_array", ["get", "array_1"]]]
+]
