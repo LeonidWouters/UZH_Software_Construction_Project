@@ -1,7 +1,23 @@
 [
   "seq",
   ["set", "array_1", ["create_array", 5]],
-  ["set_array", ["get", "array_1"], 4, 10],
-  ["set", "array_1_pos_4", ["get_array", ["get", "array_1"], 4]],
-  ["set", "array_1_size", ["get_size_array", ["get", "array_1"]]]
+  ["set_array", ["get", "array_1"], 0, 10],
+  ["set_array", ["get", "array_1"], 1, 7],
+  ["set_array", ["get", "array_1"], 2, 21],
+  ["set_array", ["get", "array_1"], 3, 0],
+  ["set_array", ["get", "array_1"], 4, 9],
+  ["set", "array_1_index_4", ["get_array", ["get", "array_1"], 4]],
+  ["set", "array_1_size", ["get_size_array", ["get", "array_1"]]],
+
+  ["set", "array_2", ["create_array", 3]],
+  ["set_array", ["get", "array_2"], 0, 1],
+  ["set_array", ["get", "array_2"], 1, 2],
+  ["set_array", ["get", "array_2"], 2, 3],
+  ["set", "array_2_index_1", ["get_array", ["get", "array_2"], 1]],
+  ["set", "array_2_size", ["get_size_array", ["get", "array_2"]]],
+
+  ["set", "concat_array_1_2", ["concatenate_arrays", ["get", "array_1"], ["get", "array_2"]]]
+
+
+
 ]

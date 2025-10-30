@@ -211,6 +211,14 @@ def do_get_size_array(args, env):
     assert isinstance(array, list), "Argument must be an array"
     return len(array)
 
+def do_concatenate_arrays(args, env):
+    assert len(args) == 2
+    array1 = do(args[0], env)
+    array2 = do(args[1], env)
+    assert isinstance(array1, list), "First argument must be an array"
+    assert isinstance(array2, list), "Second argument must be an array"
+    return array1 + array2
+
 #### OPERATIONS START ####
 OPS = {
     name.replace("do_","", 1): func
