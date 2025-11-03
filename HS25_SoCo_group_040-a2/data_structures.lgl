@@ -25,6 +25,7 @@
   ["add_set", ["get", "set_1"], 199],
   ["remove_set", ["get", "set_1"], 5],
   ["set", "set_1_size", ["get_size_set", ["get", "set_1"]]],
+  ["set", "set_1_element_5", ["element_in_set", ["get", "set_1"], 5]],
 
   ["set", "set_2", ["create_set"]],
   ["add_set", ["get", "set_2"], 3],
