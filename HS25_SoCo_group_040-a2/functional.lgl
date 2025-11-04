@@ -10,9 +10,10 @@
   ["set", "sq_func", ["func", ["n"], ["multiply", ["get","n"], ["get","n"]]]],
   ["set", "add_func", ["func", ["n"], ["addieren", ["get","n"], -10]]],
   ["set", "add", ["func", ["a", "b"], ["addieren", ["get", "a"], ["get", "b"]]]],
+  ["set", "greater_8", ["func", ["n"], ["greater_than", ["get","n"], 8]]],
 
   ["set", "array_1_mapped_sq_func", ["map", ["get", "array_1"], "sq_func"]],
   ["set", "array_1_mapped_sq_add_min10", ["map", ["get", "array_1"], "add_func"]],
 
-  ["reduce", ["get", "array_1"], "add"]
+  ["filter", ["get", "array_1"], "greater_8"]
 ]

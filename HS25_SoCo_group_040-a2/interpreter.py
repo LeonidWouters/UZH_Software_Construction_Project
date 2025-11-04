@@ -336,6 +336,21 @@ def do_reduce(args, envs):
     return result
 
 
+def do_filter(args, envs):
+    assert len(args) == 2           #Accepts an array and a function
+    array = do(args[0], envs)
+    assert isinstance(array, list)
+    function_name = args[1]
+    result = []
+
+    for item in array:
+         call_expr = ["call", function_name, item]  #Result of function call is 0 or 1
+         bool = do(call_expr, envs)                 #Safe result as a variable
+         if bool:                                   #If result was 1, then append the item
+             result.append(item)
+    return result
+
+
     #### OPERATIONS START ####
 OPS = {
     name.replace("do_","", 1): func
