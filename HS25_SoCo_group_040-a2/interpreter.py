@@ -318,7 +318,25 @@ def do_map(args, envs):
     return result
 
 
-#### OPERATIONS START ####
+def do_reduce(args, envs):
+    assert len(args) == 2           #Accepts an array and a function
+    array = do(args[0], envs)
+    assert isinstance(array, list)
+    function_name = args[1]
+
+    help_array = array.copy()       #Copy of the original array so that the original does not get manipulated
+    result = 0                      #Acts as a counter
+    result += array[0]              #Take the number on the first position of the array
+    help_array.pop(0)               #Remove the number on the first position of the array
+    while len(help_array) > 0:      #While the array contains at least 1 element
+        # Use the function on the result (counter) and the first item of the array, then remove first item of the array
+        call_expr = ["call", function_name, result, help_array[0]]
+        result = do(call_expr, envs)
+        help_array.pop(0)
+    return result
+
+
+    #### OPERATIONS START ####
 OPS = {
     name.replace("do_","", 1): func
     for (name,func) in globals().items()
