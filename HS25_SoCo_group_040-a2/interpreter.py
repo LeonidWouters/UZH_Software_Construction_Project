@@ -1,7 +1,12 @@
 import sys
 import json
 import pprint
+import time
 
+
+TRACE_ENABLED = False
+stack_traces = []
+stack_root = []
 
 ##### STEP 01 - START ######
 ## Arithmetic Ops
@@ -72,18 +77,15 @@ def do_not(args, envs):
     a = do(args[0], envs)
     return 0 if (a==1) else 1
 
-## Do until --- TODO: check!!
 def do_do_until(args, envs):
     assert len(args) == 2
     body, cond = args[0], args[1]
     result = None
     while True:
         result = do(body, envs)
-        if do(cond, envs): ## TODO: check here...
+        if do(cond, envs): 
             break
     return result
-
-#TODO: implement the algorithms 2.29 and 2.31 and an own creative one from https://math-sites.uncg.edu/sites/pauli/112/HTML/secalgrepeat.html#algevo
 
 OPERATORS = {
     "*":  "multiply",
@@ -102,7 +104,6 @@ OPERATORS = {
     "do_until": "do_until"
 }
 ##### STEP 01 - ENDS #####
-env = dict()
 
 ## lecture notes
 
@@ -190,7 +191,11 @@ def do_call(args,envs):
     for index,param_name in enumerate(params):
         local_env[param_name] = values[index]
     envs.append(local_env)
-    result = do(body,envs) #["get","num"]
+    if TRACE_ENABLED:
+        _trace_push(name_func)
+    result = do(body,envs)
+    if TRACE_ENABLED:
+        _trace_pop()
     envs.pop()
 
     return result
@@ -245,12 +250,10 @@ def do_concatenate_arrays(args, envs):
 
 
 # Info regarding sets: Sets are an unordered collection of unique elements
-# Create a set
 def do_create_set(args, envs):
     assert len(args) == 0
     return set()
 
-# Add set element
 def do_add_set(args, envs):
     assert len(args) == 2
     arg_set = do(args[0], envs)
@@ -262,7 +265,6 @@ def do_add_set(args, envs):
         pass
     return value
 
-# Remove set element
 def do_remove_set(args, envs):
     assert len(args) == 2
     arg_set = do(args[0], envs)
@@ -279,11 +281,8 @@ def do_element_in_set(args, envs):
     arg_set = do(args[0], envs)
     value = do(args[1], envs)
     assert isinstance(arg_set, set), "First argument must be an set"
-    for element in arg_set:
-        if element in arg_set:
-            return True
-        else:
-            return False
+    print("rgset: ", arg_set)
+    return 1 if value in arg_set else 0
 
 def do_get_size_set(args, envs):
     assert len(args) == 1
@@ -365,6 +364,36 @@ for operator, name in OPERATORS.items():
 
 #### OPERATIONS END ####
 
+##### STEP 04 - START ######
+def _trace_push(name):
+    node = {"name": name, "start": time.perf_counter(), "end": None, "children": []}
+    if stack_traces:
+        stack_traces[-1]["children"].append(node)
+    else:
+        stack_root.append(node)
+    stack_traces.append(node)
+
+def _trace_pop():
+    if stack_traces:
+        stack_traces[-1]["end"] = time.perf_counter()
+        stack_traces.pop()
+
+def _trace_print_tree():
+    def render(node, indent=""):
+        # time.sleep(0.01) - to debug in local
+        dur = (node["end"] - node["start"]) * 1000 if node["end"] else 0.0
+        if indent:
+            print(f"{indent}+-- {node['name']} ({dur:.3f}ms)")
+        else:
+            print(f"{node['name']} ({dur:.3f}ms)")
+        for ch in node["children"]:
+            render(ch, indent + "    ")
+
+    for root in stack_root:
+        render(root)
+##### STEP 04 - END ######
+
+
 def do(program,envs):  # ["addieren",1,2]
     if isinstance(program,int):
         return program
@@ -374,13 +403,22 @@ def do(program,envs):  # ["addieren",1,2]
 
 
 def main():
+    global TRACE_ENABLED
+    if "--trace" in sys.argv:
+        TRACE_ENABLED = True
+        sys.argv.remove("--trace")
+
     filename = sys.argv[1]
-    with open(filename,'r') as f:
+    with open(filename, 'r') as f:
         program = json.load(f)
         envs = [dict()]
-        result = do(program,envs)
-    print(">>>" , result)
-    pprint.pprint(envs)
+        result = do(program, envs)
+
+    if TRACE_ENABLED:
+        _trace_print_tree()
+    else: 
+        print(">>>", result)
+        pprint.pprint(envs)    
 
 if __name__ == '__main__':
     main()
