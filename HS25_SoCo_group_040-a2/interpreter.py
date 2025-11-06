@@ -204,13 +204,12 @@ def do_call(args,envs):
 
 ##### STEP 02 - START ######
 
-# Create an array
+# Arrays
 def do_create_array(args, envs):
     assert len(args) == 1
     size = do(args[0], envs)
     return [0] * size
 
-# Get array element
 def do_get_array(args, envs):
     assert len(args) == 2
     array = do(args[0], envs)
@@ -221,7 +220,6 @@ def do_get_array(args, envs):
     assert index < len(array), f"Array index out of bounds"
     return array[index]
 
-# Set array element
 def do_set_array(args, envs):
     assert len(args) == 3
     array = do(args[0], envs)
@@ -249,6 +247,7 @@ def do_concatenate_arrays(args, envs):
     return array1 + array2
 
 
+# Sets
 # Info regarding sets: Sets are an unordered collection of unique elements
 def do_create_set(args, envs):
     assert len(args) == 0
@@ -281,7 +280,7 @@ def do_element_in_set(args, envs):
     arg_set = do(args[0], envs)
     value = do(args[1], envs)
     assert isinstance(arg_set, set), "First argument must be an set"
-    print("rgset: ", arg_set)
+    print("argset: ", arg_set)
     return 1 if value in arg_set else 0
 
 def do_get_size_set(args, envs):
@@ -294,8 +293,7 @@ def do_merge_sets(args, envs):
     assert len(args) == 2
     set_a = do(args[0], envs)
     set_b = do(args[1], envs)
-    return set_a.union(set_b)    #TODO The result is correct, nevertheless,
-                                 # I don't get it how .union() gets to that specific order...
+    return set_a.union(set_b)
 
 ##### STEP 02 - END ######
 
@@ -325,7 +323,7 @@ def do_reduce(args, envs):
 
     help_array = array.copy()       #Copy of the original array so that the original does not get manipulated
     result = 0                      #Acts as a counter
-    result += array[0]              #Take the number on the first position of the array
+    result += array[0]              #Take the number on the first position of the array and add it to the counter
     help_array.pop(0)               #Remove the number on the first position of the array
     while len(help_array) > 0:      #While the array contains at least 1 element
         # Use the function on the result (counter) and the first item of the array, then remove first item of the array
@@ -344,8 +342,8 @@ def do_filter(args, envs):
 
     for item in array:
          call_expr = ["call", function_name, item]  #Result of function call is 0 or 1
-         bool = do(call_expr, envs)                 #Safe result as a variable
-         if bool:                                   #If result was 1, then append the item
+         func_bool = do(call_expr, envs)                 #Safe result as a variable
+         if func_bool:                                   #If result was 1, then append the item
              result.append(item)
     return result
 
